@@ -1,0 +1,224 @@
+erDiagram
+  manufacturer {
+    int manufacturer_id PK
+    varchar name
+    varchar country
+    varchar contact_email
+    timestamp created_at
+  }
+  battery_model {
+    int model_id PK
+    int manufacturer_id FK
+    varchar model_name
+    enum chemistry
+    decimal nominal_capacity_kwh
+    decimal nominal_voltage_v
+    decimal weight_kg
+    int rated_cycle_life
+  }
+  stakeholder {
+    int stakeholder_id PK
+    varchar name
+    enum type
+    varchar email
+    varchar phone
+    varchar address
+  }
+  vehicle {
+    int vehicle_id PK
+    char vin
+    varchar make
+    varchar model
+    smallint model_year
+    varchar registration_no
+  }
+  material {
+    int material_id PK
+    varchar name
+    varchar symbol
+    tinyint is_critical
+  }
+  model_material {
+    int model_id PK
+    int material_id PK
+    decimal content_kg
+  }
+  app_user {
+    int user_id PK
+    varchar username
+    varchar email
+    varchar password_hash
+    enum role
+    int stakeholder_id FK
+    tinyint is_active
+    timestamp created_at
+    datetime last_login
+  }
+  battery {
+    int battery_id PK
+    varchar serial_number
+    int model_id FK
+    date manufacture_date
+    enum status
+    decimal current_soh_pct
+    int total_cycles
+    int registered_by FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  battery_certification {
+    int cert_id PK
+    int battery_id FK
+    varchar cert_name
+    varchar issuing_body
+    varchar certificate_no
+    date issued_on
+    date expires_on
+  }
+  installation {
+    int installation_id PK
+    int battery_id FK
+    int vehicle_id FK
+    date installed_on
+    date removed_on
+    int odometer_at_install_km
+    int odometer_at_removal_km
+    varchar removal_reason
+  }
+  ownership_record {
+    int ownership_id PK
+    int battery_id FK
+    int stakeholder_id FK
+    date from_date
+    date to_date
+    varchar transfer_reason
+  }
+  repair_record {
+    int repair_id PK
+    int battery_id FK
+    int service_stakeholder_id FK
+    date repair_date
+    enum repair_type
+    text description
+    decimal cost
+    int cells_replaced
+  }
+  health_record {
+    int health_id PK
+    int battery_id FK
+    datetime recorded_at
+    decimal soh_pct
+    int cycle_count
+    decimal avg_temp_c
+    decimal max_temp_c
+    enum source
+  }
+  telemetry_threshold {
+    enum metric PK
+    decimal min_value
+    decimal max_value
+  }
+  battery_alert {
+    int alert_id PK
+    int battery_id FK
+    enum metric FK
+    decimal observed_value
+    decimal limit_value
+    enum direction
+    datetime recorded_at
+    enum status
+    int acknowledged_by FK
+    timestamp created_at
+    varchar note
+  }
+  assessment_rule {
+    varchar rule_key PK
+    decimal rule_value
+    varchar description
+    timestamp updated_at
+  }
+  second_life_assessment {
+    int assessment_id PK
+    int battery_id FK
+    int assessed_by FK
+    datetime assessed_on
+    decimal soh_pct
+    int cycle_count
+    decimal max_temp_c
+    int repair_count
+    decimal score
+    enum decision
+    text explanation
+    json rules_used
+  }
+  refurbishment_record {
+    int refurb_id PK
+    int battery_id FK
+    int refurbisher_id FK
+    date start_date
+    date end_date
+    text work_done
+    decimal soh_before
+    decimal soh_after
+    enum outcome
+    varchar reuse_application
+    decimal cost
+  }
+  recycling_record {
+    int recycling_id PK
+    int battery_id FK
+    int recycler_id FK
+    date recycled_on
+    enum method
+    decimal total_input_kg
+    varchar notes
+  }
+  recovered_material {
+    int recovery_id PK
+    int recycling_id FK
+    int material_id FK
+    decimal quantity_kg
+    decimal purity_pct
+  }
+  lifecycle_event {
+    bigint event_id PK
+    int battery_id FK
+    enum event_type
+    datetime event_time
+    varchar description
+  }
+  audit_log {
+    bigint log_id PK
+    varchar table_name
+    varchar record_id
+    varchar action
+    varchar old_value
+    varchar new_value
+    timestamp changed_at
+  }
+  manufacturer ||--o{ battery_model : "manufacturer_id"
+  battery_model ||--o{ model_material : "model_id"
+  material ||--o{ model_material : "material_id"
+  stakeholder |o--o{ app_user : "stakeholder_id"
+  battery_model ||--o{ battery : "model_id"
+  app_user |o--o{ battery : "registered_by"
+  battery ||--o{ battery_certification : "battery_id"
+  battery ||--o{ installation : "battery_id"
+  vehicle ||--o{ installation : "vehicle_id"
+  battery ||--o{ ownership_record : "battery_id"
+  stakeholder ||--o{ ownership_record : "stakeholder_id"
+  battery ||--o{ repair_record : "battery_id"
+  stakeholder ||--o{ repair_record : "service_stakeholder_id"
+  battery ||--o{ health_record : "battery_id"
+  battery ||--o{ battery_alert : "battery_id"
+  telemetry_threshold ||--o{ battery_alert : "metric"
+  app_user |o--o{ battery_alert : "acknowledged_by"
+  battery ||--o{ second_life_assessment : "battery_id"
+  app_user ||--o{ second_life_assessment : "assessed_by"
+  battery ||--o{ refurbishment_record : "battery_id"
+  stakeholder ||--o{ refurbishment_record : "refurbisher_id"
+  battery ||--o| recycling_record : "battery_id"
+  stakeholder ||--o{ recycling_record : "recycler_id"
+  recycling_record ||--o{ recovered_material : "recycling_id"
+  material ||--o{ recovered_material : "material_id"
+  battery ||--o{ lifecycle_event : "battery_id"

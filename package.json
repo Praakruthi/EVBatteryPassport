@@ -1,0 +1,24 @@
+{
+  "name": "batterypassport",
+  "version": "1.0.0",
+  "private": true,
+  "description": "BatteryPassport - EV battery lifecycle, traceability and second-life assessment platform (DBMS Level 3 project)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:mysql": "node scripts/setup-mysql.js",
+    "db:mongo": "node scripts/seed-mongo.js",
+    "db:setup": "node scripts/setup-mysql.js && node scripts/seed-mongo.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "jose": "^5.9.3",
+    "mongodb": "^6.9.0",
+    "mysql2": "^3.11.3",
+    "next": "14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "engines": { "node": ">=18.17" }
+}

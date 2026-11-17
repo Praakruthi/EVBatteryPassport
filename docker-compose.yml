@@ -1,0 +1,21 @@
+# Optional: starts MySQL 8 and MongoDB 7 locally (matches .env.example).
+#   docker compose up -d
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: bp-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: bp_root_pw
+    command: --log-bin-trust-function-creators=1
+    ports: ["3306:3306"]
+    volumes: ["bp_mysql:/var/lib/mysql"]
+  mongo:
+    image: mongo:7
+    container_name: bp-mongo
+    restart: unless-stopped
+    ports: ["27017:27017"]
+    volumes: ["bp_mongo:/data/db"]
+volumes:
+  bp_mysql:
+  bp_mongo:
